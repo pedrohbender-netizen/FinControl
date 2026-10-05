@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinControl - Gestão Financeira</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js para o gráfico financeiro -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="header">
+    <div class="container header-content">
+      <div class="brand">
+        <div class="brand-icon">💲</div>
+        <div class="brand-text">
+          <h1>FinControl</h1>
+          <p>Controlo e gestão orçamental</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        <span>Online</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- CARDS DE RESUMO -->
+    <section class="cards-grid">
+      <div class="card entrada">
+        <h3>Entradas</h3>
+        <p class="valor" id="total-entradas">R$ 0,00</p>
+      </div>
+      <div class="card saida">
+        <h3>Saídas</h3>
+        <p class="valor" id="total-saidas">R$ 0,00</p>
+      </div>
+      <div class="card total">
+        <h3>Saldo Total</h3>
+        <p class="valor" id="total-saldo">R$ 0,00</p>
+      </div>
+    </section>
+
+    <!-- PAINEL DE SAÚDE FINANCEIRA -->
+    <section class="card budget-card">
+      <div class="budget-header">
+        <span>Uso do Orçamento (Saídas / Entradas)</span>
+        <button type="button" class="btn-toggle-details" id="btn-toggle-details">Ver Detalhes</button>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+      <div class="insights-row">
+        <span id="budget-percentage-text">0% do orçamento utilizado</span>
+        <span id="budget-status-text">Situação Estável</span>
+      </div>
+
+      <div class="budget-details hidden" id="budget-details">
+        <hr class="divider">
+        <div class="details-content">
+          <div>
+            <h4>Maiores Gastos do Mês</h4>
+            <ol class="top-list" id="top-expenses-list">
+              <li>Sem dados suficientes</li>
+            </ol>
+          </div>
+          <div class="daily-average-box">
+            <h4>Média Diária de Gastos</h4>
+            <p id="daily-average-val">R$ 0,00 / dia</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRELHA: FORMULÁRIO + GRÁFICO -->
+    <div class="dashboard-grid">
+      
+      <!-- FORMULÁRIO DE NOVA TRANSAÇÃO -->
+      <section class="form-section">
+        <h2>Adicionar Transação</h2>
+        <form id="finance-form">
+          
+          <div class="input-group">
+            <label for="description">Descrição</label>
+            <input type="text" id="description" placeholder="Ex: Supermercado, Salário..." required>
+          </div>
+
+          <div class="input-group">
+            <label for="amount">Valor (R$)</label>
+            <input type="number" id="amount" step="0.01" min="0.01" placeholder="0,00" required>
+          </div>
+
+          <div class="input-group">
+            <label for="type">Tipo</label>
+            <select id="type" required>
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="category">Categoria</label>
+            <select id="category" required>
+              <option value="🍔 Alimentação">🍔 Alimentação</option>
+              <option value="🏠 Moradia">🏠 Moradia</option>
+              <option value="🚗 Transporte">🚗 Transporte</option>
+              <option value="🎉 Lazer">🎉 Lazer</option>
+              <option value="💡 Contas">💡 Contas</option>
+              <option value="💼 Salário">💼 Salário</option>
+              <option value="📈 Investimentos">📈 Investimentos</option>
+              <option value="📦 Outros">📦 Outros</option>
+            </select>
+          </div>
+
+          <!-- SELETORES DE DATA (DIA / MÊS / ANO) -->
+          <div class="input-group" style="grid-column: span 2;">
+            <label>Data</label>
+            <div style="display: flex; gap: 6px;">
+              <select id="day" required>
+                <option value="">Dia</option>
+                <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                <option value="07">07</option><option value="08">08</option><option value="09">09</option>
+                <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                <option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                <option value="16">16</option><option value="17">17</option><option value="18">18</option>
+                <option value="19">19</option><option value="20">20</option><option value="21">21</option>
+                <option value="22">22</option><option value="23">23</option><option value="24">24</option>
+                <option value="25">25</option><option value="26">26</option><option value="27">27</option>
+                <option value="28">28</option><option value="29">29</option><option value="30">30</option>
+                <option value="31">31</option>
+              </select>
+
+              <select id="month" required>
+                <option value="">Mês</option>
+                <option value="01">Janeiro</option>
+                <option value="02">Fevereiro</option>
+                <option value="03">Março</option>
+                <option value="04">Abril</option>
+                <option value="05">Maio</option>
+                <option value="06">Junho</option>
+                <option value="07">Julho</option>
+                <option value="08">Agosto</option>
+                <option value="09">Setembro</option>
+                <option value="10">Outubro</option>
+                <option value="11">Novembro</option>
+                <option value="12">Dezembro</option>
+              </select>
+
+              <select id="year" required>
+                <option value="">Ano</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2027">2028</option>
+                <option value="2027">2029</option>
+                <option value="2028">2029</option>
+                <option value="2029">2030</option>
+                <option value="2030">2031</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" style="grid-column: span 2;">Adicionar Transação</button>
+        </form>
+      </section>
+
+      <!-- GRÁFICO -->
+      <section class="form-section chart-card">
+        <h2>Distribuição por Categoria</h2>
+        <div class="chart-container">
+          <canvas id="finance-chart"></canvas>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- SEÇÃO DE HISTÓRICO E FILTROS -->
+    <section class="table-section">
+      <div class="section-header">
+        <h2>Histórico</h2>
+        <div class="action-buttons">
+          <button type="button" class="btn-action" id="btn-export-csv">Exportar CSV</button>
+          <button type="button" class="btn-action btn-danger" id="btn-clear-all">Limpar Tudo</button>
+        </div>
+      </div>
+
+      <!-- FILTROS DE PESQUISA -->
+      <div class="filter-group">
+        <input type="text" id="search-input" placeholder="Buscar por descrição...">
+        
+        <select id="filter-month">
+          <option value="">Todos os meses</option>
+          <option value="01">Janeiro</option>
+          <option value="02">Fevereiro</option>
+          <option value="03">Março</option>
+          <option value="04">Abril</option>
+          <option value="05">Maio</option>
+          <option value="06">Junho</option>
+          <option value="07">Julho</option>
+          <option value="08">Agosto</option>
+          <option value="09">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>
+        </select>
+
+        <select id="filter-year">
+          <option value="">Todos os anos</option>
+          <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2027">2028</option>
+                <option value="2027">2029</option>
+                <option value="2029">2030</option>
+                <option value="2030">2031</option>
+        </select>
+      </div>
+
+      <!-- TABELA DE TRANSAÇÕES -->
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Valor</th>
+              <th>Tipo</th>
+              <th>Categoria</th>
+              <th>Data</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="transaction-list">
+            <!-- As transações serão inseridas aqui via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ -->
+  <footer class="footer container">
+    <p>Desenvolvido para Gestão Financeira Pessoal</p>
+  </footer>
+
+  <!-- NOTIFICAÇÕES (TOAST) -->
+  <div id="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
