@@ -278,31 +278,38 @@ tr:last-child td {
   color: white;
 }
 
-/* Rodapé */
+/* ESTILOS DO RODAPÉ */
 .footer {
+  margin-top: 40px;
+  padding: 24px 0;
+  border-top: 1px solid #334155;
+  color: #94a3b8;
   text-align: center;
-  padding: 2rem 0;
-  margin-top: 3rem;
-  border-top: 1px solid var(--card-border);
-  color: var(--text-muted);
-  font-size: 0.875rem;
 }
 
-.footer p {
-  margin-bottom: 0.3rem;
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
 }
 
-.footer strong {
-  color: var(--text-main);
+.footer-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  font-size: 0.9rem;
 }
 
 .footer a {
-  color: #58a6ff;
+  color: #38bdf8;
   text-decoration: none;
-  transition: var(--transition);
+  transition: color 0.2s;
 }
 
 .footer a:hover {
+  color: #7dd3fc;
   text-decoration: underline;
 }
 
