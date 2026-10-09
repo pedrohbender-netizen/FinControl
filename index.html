@@ -223,11 +223,21 @@
         </select>
       </div>
 
+      <!-- BOTÃO DE EXCLUSÃO EM LOTE -->
+      <div style="margin-bottom: 12px; display: flex; gap: 10px;">
+        <button id="btn-delete-selected" class="btn-danger-outline" style="display: none;">
+          🗑️ Excluir Selecionados (<span id="selected-count">0</span>)
+        </button>
+      </div>
+
       <!-- TABELA DE TRANSAÇÕES -->
       <div class="table-responsive">
         <table>
           <thead>
             <tr>
+              <th style="width: 40px;">
+                <input type="checkbox" id="select-all-checkbox" title="Selecionar Todos">
+              </th>
               <th>Descrição</th>
               <th>Valor</th>
               <th>Tipo</th>

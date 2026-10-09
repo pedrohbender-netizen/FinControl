@@ -35,6 +35,10 @@ const filterYearInput = document.getElementById('filter-year');
 const btnClearAll = document.getElementById('btn-clear-all');
 const btnExportCsv = document.getElementById('btn-export-csv');
 
+const selectAllCheckbox = document.getElementById('select-all-checkbox');
+const btnDeleteSelected = document.getElementById('btn-delete-selected');
+const selectedCountEl = document.getElementById('selected-count');
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   setDefaultDateSelects();
@@ -79,6 +83,14 @@ function setupEventListeners() {
   if (btnExportCsv) {
     btnExportCsv.addEventListener('click', handleExportCSV);
   }
+
+  if (selectAllCheckbox) {
+  selectAllCheckbox.addEventListener('change', handleSelectAll);
+}
+
+if (btnDeleteSelected) {
+  btnDeleteSelected.addEventListener('click', handleDeleteSelected);
+}
 
   if (btnToggleDetails && budgetDetails) {
     btnToggleDetails.addEventListener('click', () => {
@@ -258,6 +270,9 @@ function renderTable(dataList) {
     const typeText = t.type === 'entrada' ? 'Entrada' : 'Saída';
 
     tr.innerHTML = `
+      <td>
+        <input type="checkbox" class="transaction-checkbox" data-id="${t.id}" onchange="updateSelectionUI()">
+      </td>
       <td><strong>${escapeHtml(t.description)}</strong></td>
       <td style="color: ${t.type === 'entrada' ? '#22c55e' : '#ef4444'}; font-weight: bold;">
         ${t.type === 'entrada' ? '+' : '-'} ${formattedAmount}
@@ -274,6 +289,10 @@ function renderTable(dataList) {
 
     transactionListEl.appendChild(tr);
   });
+
+  // Reseta a caixa de seleção do cabeçalho e atualiza a interface
+  if (selectAllCheckbox) selectAllCheckbox.checked = false;
+  updateSelectionUI();
 }
 
 // Painel de Saúde Financeira
@@ -471,4 +490,53 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Marcar / Desmarcar todas as checkboxes
+function handleSelectAll(e) {
+  const isChecked = e.target.checked;
+  const checkboxes = document.querySelectorAll('.transaction-checkbox');
+  
+  checkboxes.forEach(cb => {
+    cb.checked = isChecked;
+  });
+
+  updateSelectionUI();
+}
+
+// Atualizar a interface quando uma checkbox muda de estado
+function updateSelectionUI() {
+  const checkedBoxes = document.querySelectorAll('.transaction-checkbox:checked');
+  const totalBoxes = document.querySelectorAll('.transaction-checkbox');
+  const count = checkedBoxes.length;
+
+  if (selectedCountEl) selectedCountEl.textContent = count;
+
+  // Mostrar ou ocultar o botão de exclusão em lote
+  if (btnDeleteSelected) {
+    btnDeleteSelected.style.display = count > 0 ? 'inline-flex' : 'none';
+  }
+
+  // Atualizar a checkbox "Selecionar Todos"
+  if (selectAllCheckbox && totalBoxes.length > 0) {
+    selectAllCheckbox.checked = (count === totalBoxes.length);
+  }
+}
+
+// Apagar todas as transações selecionadas
+function handleDeleteSelected() {
+  const checkedBoxes = document.querySelectorAll('.transaction-checkbox:checked');
+  if (checkedBoxes.length === 0) return;
+
+  const total = checkedBoxes.length;
+  if (confirm(`Tem a certeza de que deseja apagar as ${total} transações selecionadas?`)) {
+    const idsToDelete = Array.from(checkedBoxes).map(cb => Number(cb.dataset.id));
+    
+    // Remover do array
+    transactions = transactions.filter(t => !idsToDelete.includes(t.id));
+    
+    saveToLocalStorage();
+    renderApp();
+    showToast(`${total} transação(ões) removida(s) com sucesso.`, 'success');
+  }
 }
