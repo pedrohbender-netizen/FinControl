@@ -270,21 +270,16 @@ function renderTable(dataList) {
     const typeText = t.type === 'entrada' ? 'Entrada' : 'Saída';
 
     tr.innerHTML = `
-      <td>
-        <input type="checkbox" class="transaction-checkbox" data-id="${t.id}" onchange="updateSelectionUI()">
-      </td>
-      <td><strong>${escapeHtml(t.description)}</strong></td>
-      <td style="color: ${t.type === 'entrada' ? '#22c55e' : '#ef4444'}; font-weight: bold;">
-        ${t.type === 'entrada' ? '+' : '-'} ${formattedAmount}
-      </td>
-      <td><span class="${typeBadgeClass}">${typeText}</span></td>
-      <td>${escapeHtml(t.category)}</td>
-      <td>${formattedDate}</td>
-      <td>
-        <button class="btn-delete" onclick="handleDeleteTransaction(${t.id})" title="Apagar">
-          🗑️
-        </button>
-      </td>
+    <td><strong>${escapeHtml(t.description)}</strong></td>
+    <td style="color: ${t.type === 'entrada' ? '#22c55e' : '#ef4444'}; font-weight: bold;">
+    ${t.type === 'entrada' ? '+' : '-'} ${formattedAmount}
+    </td>
+    <td><span class="${typeBadgeClass}">${typeText}</span></td>
+    <td>${escapeHtml(t.category)}</td>
+    <td>${formattedDate}</td>
+    <td>
+      <input type="checkbox" class="transaction-checkbox" data-id="${t.id}" onchange="updateSelectionUI()">
+    </td>
     `;
 
     transactionListEl.appendChild(tr);
