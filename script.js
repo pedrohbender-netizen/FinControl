@@ -9,6 +9,7 @@ let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let chartInstance = null;
 
 // Elementos do DOM
+const btnThemeToggle = document.getElementById('btn-theme-toggle');
 const btnCancelEdit = document.getElementById('btn-cancel-edit');
 const form = document.getElementById('finance-form');
 const descriptionInput = document.getElementById('description');
@@ -45,6 +46,28 @@ const selectedCountEl = document.getElementById('selected-count');
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Carregar preferência de tema do utilizador
+const savedTheme = localStorage.getItem('fincontrol_theme');
+
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    if (btnThemeToggle) btnThemeToggle.textContent = '🌙';
+  }
+
+  if (btnThemeToggle) {
+    btnThemeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-theme');
+      const isLight = document.body.classList.contains('light-theme');
+      
+      // Mudar o ícone do botão
+      btnThemeToggle.textContent = isLight ? '🌙' : '☀️';
+      
+      // Guardar preferência no LocalStorage
+      localStorage.setItem('fincontrol_theme', isLight ? 'light' : 'dark');
+    });
+  }
+
   setDefaultDateSelects();
   renderApp();
   setupEventListeners();

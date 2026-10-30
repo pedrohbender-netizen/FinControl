@@ -685,3 +685,71 @@ tbody tr:hover {
   background-color: rgba(245, 158, 11, 0.02);
   transition: all 0.3s ease;
 }
+
+/* Estilo do botão de Tema */
+.btn-theme {
+  background-color: transparent;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-theme:hover {
+  background-color: #334155;
+}
+
+/* ==========================================
+   TEMA CLARO (LIGHT THEME)
+   ========================================== */
+body.light-theme {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+body.light-theme .header,
+body.light-theme .card,
+body.light-theme .form-section,
+body.light-theme .table-section,
+body.light-theme .budget-card {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme input, 
+body.light-theme select {
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+body.light-theme input::placeholder {
+  color: #94a3b8;
+}
+
+body.light-theme th {
+  color: #475569;
+}
+
+body.light-theme td {
+  border-bottom-color: #e2e8f0;
+  color: #1e293b;
+}
+
+body.light-theme .btn-theme {
+  border-color: #cbd5e1;
+  color: #0f172a;
+  background-color: #e2e8f0;
+}
+
+body.light-theme .btn-theme:hover {
+  background-color: #cbd5e1;
+}
