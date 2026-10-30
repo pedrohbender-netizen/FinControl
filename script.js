@@ -1,11 +1,15 @@
 // Chave para guardar no navegador (LocalStorage)
 const STORAGE_KEY = 'financas_transacoes';
 
+// Variável para controlar se estamos a editar uma transação
+let editingId = null;
+
 // Estado da aplicação
 let transactions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let chartInstance = null;
 
 // Elementos do DOM
+const btnCancelEdit = document.getElementById('btn-cancel-edit');
 const form = document.getElementById('finance-form');
 const descriptionInput = document.getElementById('description');
 const amountInput = document.getElementById('amount');
@@ -84,6 +88,10 @@ function setupEventListeners() {
     btnExportCsv.addEventListener('click', handleExportCSV);
   }
 
+  if (btnCancelEdit) {
+    btnCancelEdit.addEventListener('click', handleCancelEdit);
+  }
+
   if (selectAllCheckbox) {
   selectAllCheckbox.addEventListener('change', handleSelectAll);
 }
@@ -117,42 +125,60 @@ function handleAddTransaction(e) {
   e.preventDefault();
 
   const description = descriptionInput.value.trim();
-  const amount = parseFloat(amountInput.value);
+  const amount = Number(amountInput.value);
   const type = typeInput.value;
   const category = categoryInput.value;
   const day = dayInput.value;
   const month = monthInput.value;
   const year = yearInput.value;
 
-  if (!description || isNaN(amount) || amount <= 0 || !day || !month || !year) {
-    showToast('Por favor, preencha todos os campos corretamente.', 'error');
+  if (!description || isNaN(amount) || amount <= 0) {
+    showToast('Por favor, preencha a descrição e um valor válido.', 'error');
     return;
   }
 
-  const paddedDay = day.padStart(2, '0');
-  const paddedMonth = month.padStart(2, '0');
+  if (editingId !== null) {
+    // MODO DE EDIÇÃO: Atualizar a transação existente
+    transactions = transactions.map(t => {
+      if (t.id === editingId) {
+        return { ...t, description, amount, type, category, day, month, year };
+      }
+      return t;
+    });
 
-  const newTransaction = {
-    id: Date.now(),
-    description,
-    amount,
-    type,
-    category,
-    day: paddedDay,
-    month: paddedMonth,
-    year,
-    date: `${year}-${paddedMonth}-${paddedDay}`
-  };
+    showToast('Transação atualizada com sucesso!', 'success');
+    editingId = null;
 
-  transactions.push(newTransaction);
+    // Restaurar o texto original do botão de submit
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Adicionar Transação';
+
+    // Ocultar o botão de cancelar após atualizar
+    if (btnCancelEdit) btnCancelEdit.style.display = 'none';
+  } else {
+    // MODO DE CRIAÇÃO: Adicionar nova transação
+    const newTransaction = {
+      id: Date.now(),
+      description,
+      amount,
+      type,
+      category,
+      day,
+      month,
+      year
+    };
+
+    transactions.push(newTransaction);
+    showToast('Transação adicionada com sucesso!', 'success');
+  }
+
+  // Remover a moldura de destaque de edição do formulário
+  if (form) form.classList.remove('editing-active');
+
   saveToLocalStorage();
   renderApp();
-
-  // Reiniciar o formulário mantendo a data por defeito
   form.reset();
-  setDefaultDateSelects();
-
-  showToast('Transação adicionada com sucesso!', 'success');
+  setDefaultDateSelects(); // Restaura a data de hoje nos selects, se aplicável
 }
 
 // Remover transação individual
@@ -270,16 +296,19 @@ function renderTable(dataList) {
     const typeText = t.type === 'entrada' ? 'Entrada' : 'Saída';
 
     tr.innerHTML = `
-    <td><strong>${escapeHtml(t.description)}</strong></td>
-    <td style="color: ${t.type === 'entrada' ? '#22c55e' : '#ef4444'}; font-weight: bold;">
-    ${t.type === 'entrada' ? '+' : '-'} ${formattedAmount}
-    </td>
-    <td><span class="${typeBadgeClass}">${typeText}</span></td>
-    <td>${escapeHtml(t.category)}</td>
-    <td>${formattedDate}</td>
-    <td>
-      <input type="checkbox" class="transaction-checkbox" data-id="${t.id}" onchange="updateSelectionUI()">
-    </td>
+      <td><strong>${escapeHtml(t.description)}</strong></td>
+      <td style="color: ${t.type === 'entrada' ? '#22c55e' : '#ef4444'}; font-weight: bold;">
+        ${t.type === 'entrada' ? '+' : '-'} ${formattedAmount}
+      </td>
+      <td><span class="${typeBadgeClass}">${typeText}</span></td>
+      <td>${escapeHtml(t.category)}</td>
+      <td>${formattedDate}</td>
+      <td style="display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
+        <button class="btn-edit" onclick="handleEditTransaction(${t.id})" title="Editar">
+          ✏️
+        </button>
+        <input type="checkbox" class="transaction-checkbox" data-id="${t.id}" onchange="updateSelectionUI()">
+      </td>
     `;
 
     transactionListEl.appendChild(tr);
@@ -534,4 +563,43 @@ function handleDeleteSelected() {
     renderApp();
     showToast(`${total} transação(ões) removida(s) com sucesso.`, 'success');
   }
+}
+
+// Carregar os dados da transação para o formulário para edição
+function handleEditTransaction(id) {
+  const transaction = transactions.find(t => t.id === id);
+  if (!transaction) return;
+
+  descriptionInput.value = transaction.description;
+  amountInput.value = transaction.amount;
+  typeInput.value = transaction.type;
+  categoryInput.value = transaction.category;
+  dayInput.value = transaction.day;
+  monthInput.value = transaction.month;
+  yearInput.value = transaction.year;
+
+  editingId = id;
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = 'Atualizar Transação';
+
+  // Mostrar botão de cancelar e destacar o formulário
+  if (btnCancelEdit) btnCancelEdit.style.display = 'inline-flex';
+  if (form) form.classList.add('editing-active');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Cancelar o modo de edição e restaurar o formulário
+function handleCancelEdit() {
+  editingId = null;
+  form.reset();
+  setDefaultDateSelects();
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) submitBtn.textContent = 'Adicionar Transação';
+  if (btnCancelEdit) btnCancelEdit.style.display = 'none';
+  if (form) form.classList.remove('editing-active');
+
+  showToast('Edição cancelada.', 'info');
 }

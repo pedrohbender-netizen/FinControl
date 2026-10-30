@@ -618,3 +618,70 @@ tbody tr:hover {
   background-color: #ef4444;
   color: #ffffff;
 }
+
+/* Estilo do botão de Editar */
+.btn-edit {
+  background-color: transparent;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit:hover {
+  background-color: #334155;
+  border-color: #64748b;
+}
+
+/* Estilo do botão de Cancelar Edição */
+.btn-secondary-outline {
+  background-color: transparent;
+  border: 1px solid #64748b;
+  color: #94a3b8;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-outline:hover {
+  background-color: #334155;
+  color: #ffffff;
+  border-color: #94a3b8;
+}
+
+/* Botão de Cancelar mais chamativo (tom de alerta/aviso) */
+.btn-secondary-outline {
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid #f59e0b;
+  color: #fbbf24;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary-outline:hover {
+  background-color: #f59e0b;
+  color: #0f172a;
+  border-color: #f59e0b;
+}
+
+/* Destaque visual no formulário quando estiver a editar */
+#finance-form.editing-active {
+  border: 1px solid #f59e0b;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(245, 158, 11, 0.02);
+  transition: all 0.3s ease;
+}
